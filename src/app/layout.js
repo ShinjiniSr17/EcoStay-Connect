@@ -1,5 +1,6 @@
 import { Poppins } from "next/font/google";
 import "./globals.css";
+import Toast from "../components/ui/Toast";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -13,10 +14,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${poppins.className} bg-gray-50 text-gray-800 antialiased`}
+        className={`${poppins.className} bg-gray-50 text-gray-800 antialiased dark:bg-gray-900 dark:text-white`}
       >
+        <Toast />
         {children}
       </body>
     </html>

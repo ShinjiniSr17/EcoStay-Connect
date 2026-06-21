@@ -1,32 +1,52 @@
+"use client";
+
+import ThemeToggle from "./ThemeToggle";
+import Link from "next/link";
+
 export default function Navbar() {
   return (
-    <nav className="bg-white shadow-md px-8 py-5 flex justify-between items-center sticky top-0 z-50">
+    <nav className="bg-white dark:bg-gray-900 shadow-md px-6 md:px-8 py-5 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-0 z-50">
 
-  <h1 className="text-3xl font-bold text-emerald-700">
-    🌿 EcoStay Connect
-  </h1>
+      {/* Logo */}
+      <h1 className="text-3xl font-bold text-emerald-700 dark:text-emerald-400">
+        🌿 EcoStay Connect
+      </h1>
 
-  <div className="space-x-8 font-medium text-gray-700">
-    <a href="/" className="hover:text-emerald-600">
-      Home
-    </a>
+      {/* Navigation Links */}
+      <div className="flex flex-wrap justify-center gap-6 font-medium text-gray-700 dark:text-gray-200">
 
-    <a href="/about" className="hover:text-emerald-600">
-      About
-    </a>
+        <Link href="/" className="hover:text-emerald-600">
+          Home
+        </Link>
 
-    <a href="/dashboard" className="hover:text-emerald-600">
-      Dashboard
-    </a>
+        <Link href="/about" className="hover:text-emerald-600">
+          About
+        </Link>
 
-    <a href="/login" className="hover:text-emerald-600">
-      Login
-    </a>
-    </div>
+        <Link href="/dashboard" className="hover:text-emerald-600">
+          Dashboard
+        </Link>
 
-  <button className="bg-emerald-600 text-white px-5 py-2 rounded-full hover:bg-emerald-700">
-    Sign In
-  </button>
-  </nav>
+        <Link href="/login" className="hover:text-emerald-600">
+          Login
+        </Link>
+
+      </div>
+
+      {/* Theme Toggle + Sign In */}
+      <div className="flex items-center gap-4">
+
+        <ThemeToggle />
+
+        <Link
+          href="/login"
+          className="bg-emerald-600 text-white px-5 py-2 rounded-full hover:bg-emerald-700 transition"
+        >
+          Sign In
+        </Link>
+
+      </div>
+
+    </nav>
   );
 }
