@@ -23,8 +23,8 @@ export default function Navbar() {
           About
         </Link>
 
-        <Link href="/dashboard" className="hover:text-emerald-600">
-          Dashboard
+        <Link href="/admin" className="hover:text-emerald-600">
+          Host Dashboard
         </Link>
 
         <Link href="/login" className="hover:text-emerald-600">

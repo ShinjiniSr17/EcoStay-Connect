@@ -1,128 +1,156 @@
+console.log("📂 stays.js LOADED");
 const express = require("express");
 const router = express.Router();
 
-let stays = require("../data/stays");
+const Stay = require("../models/Stay");
 
 // ===============================
 // GET ALL STAYS
 // GET /api/stays
 // ===============================
-router.get("/", (req, res) => {
-  res.status(200).json(stays);
+router.get("/", async (req, res, next) => {
+  console.log("🔥 USING MONGODB ROUTE");
+
+  try {
+    const stays = await Stay.find();
+
+    console.log("MongoDB returned:", stays);
+
+    res.status(200).json(stays);
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
 });
 
 // ===============================
 // SEARCH STAYS
 // GET /api/stays/search?q=manali
 // ===============================
-router.get("/search", (req, res) => {
-  const q = req.query.q;
+router.get("/search", async (req, res, next) => {
+  try {
+    const q = req.query.q;
 
-  if (!q) {
-    return res.status(400).json({
-      message: "Query is required"
+    if (!q) {
+      return res.status(400).json({
+        message: "Query is required",
+      });
+    }
+
+    const stays = await Stay.find({
+      $or: [
+        { name: { $regex: q, $options: "i" } },
+        { location: { $regex: q, $options: "i" } },
+      ],
     });
+
+    res.status(200).json(stays);
+  } catch (err) {
+    next(err);
   }
-
-  const result = stays.filter(
-    (s) =>
-      s.name.toLowerCase().includes(q.toLowerCase()) ||
-      s.location.toLowerCase().includes(q.toLowerCase())
-  );
-
-  res.status(200).json(result);
 });
 
 // ===============================
 // GET STAY BY ID
-// GET /api/stays/1
+// GET /api/stays/:id
 // ===============================
-router.get("/:id", (req, res, next) => {
-  const id = parseInt(req.params.id);
+router.get("/:id", async (req, res, next) => {
+  try {
+    const stay = await Stay.findById(req.params.id);
 
-  const stay = stays.find((s) => s.id === id);
+    if (!stay) {
+      return res.status(404).json({
+        message: "Stay not found",
+      });
+    }
 
-  if (!stay) {
-    const error = new Error("Stay not found");
-    error.status = 404;
-
-    return next(error);
+    res.status(200).json(stay);
+  } catch (err) {
+    next(err);
   }
-
-  res.status(200).json(stay);
 });
 
 // ===============================
 // CREATE STAY
 // POST /api/stays
 // ===============================
-router.post("/", (req, res) => {
-  const newStay = req.body;
+router.post("/", async (req, res, next) => {
+  try {
+    const { name, location, price, rating, image } = req.body;
 
-  if (!newStay.name || !newStay.location || !newStay.price) {
-    return res.status(400).json({
-      message: "Missing fields"
+    if (!name || !location || !price || !image) {
+      return res.status(400).json({
+        message: "Missing required fields",
+      });
+    }
+
+    const newStay = await Stay.create({
+      name,
+      location,
+      price,
+      rating,
+      image,
     });
+
+    res.status(201).json({
+      message: "Stay created successfully",
+      data: newStay,
+    });
+  } catch (err) {
+    next(err);
   }
-
-  newStay.id = stays.length
-    ? stays[stays.length - 1].id + 1
-    : 1;
-
-  stays.push(newStay);
-
-  res.status(201).json({
-    message: "Stay created successfully",
-    data: newStay
-  });
 });
 
 // ===============================
 // UPDATE STAY
 // PUT /api/stays/:id
 // ===============================
-router.put("/:id", (req, res) => {
-  const id = parseInt(req.params.id);
+router.put("/:id", async (req, res, next) => {
+  try {
+    const updatedStay = await Stay.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
-  const index = stays.findIndex((s) => s.id === id);
+    if (!updatedStay) {
+      return res.status(404).json({
+        message: "Stay not found",
+      });
+    }
 
-  if (index === -1) {
-    return res.status(404).json({
-      message: "Stay not found"
+    res.status(200).json({
+      message: "Stay updated successfully",
+      data: updatedStay,
     });
+  } catch (err) {
+    next(err);
   }
-
-  stays[index] = {
-    ...stays[index],
-    ...req.body
-  };
-
-  res.status(200).json({
-    message: "Stay updated successfully",
-    data: stays[index]
-  });
 });
 
 // ===============================
 // DELETE STAY
 // DELETE /api/stays/:id
 // ===============================
-router.delete("/:id", (req, res) => {
-  const id = parseInt(req.params.id);
+router.delete("/:id", async (req, res, next) => {
+  try {
+    const deletedStay = await Stay.findByIdAndDelete(req.params.id);
 
-  const initialLength = stays.length;
+    if (!deletedStay) {
+      return res.status(404).json({
+        message: "Stay not found",
+      });
+    }
 
-  stays = stays.filter((s) => s.id !== id);
-
-  if (stays.length === initialLength) {
-    return res.status(404).json({
-      message: "Stay not found"
+    res.status(200).json({
+      message: "Stay deleted successfully",
     });
+  } catch (err) {
+    next(err);
   }
-
-  res.status(200).json({
-    message: "Stay deleted successfully"
-  });
 });
 
 module.exports = router;

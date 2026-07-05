@@ -46,10 +46,10 @@ export default function Home() {
       {!loading && !error &&
       stays.map((stay) => (
         <Card
-        key={stay.id}
+        key={stay._id}
         title={stay.name}
         description={`${stay.location} • ₹${stay.price}/night`}
-        image="https://images.unsplash.com/photo-1506744038136-46273834b3fb"
+        image={stay.image}
         />
     ))
   }
