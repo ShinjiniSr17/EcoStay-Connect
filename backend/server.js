@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 
 const errorHandler = require("./middleware/errorHandler");
 const staysRouter = require("./routes/stays");
-
+const authRoutes = require("./routes/auth");
 const app = express();
 
 // -------------------------
@@ -28,6 +28,7 @@ mongoose
 // -------------------------
 app.use(cors());
 app.use(express.json());
+app.use("/api/auth", authRoutes);
 
 console.log("Server starting...");
 

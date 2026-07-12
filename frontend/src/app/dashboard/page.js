@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
@@ -10,14 +11,24 @@ import Button from "../../components/ui/Button";
 import Modal from "../../components/ui/Modal";
 
 export default function Dashboard() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  }, []);
+
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    router.push("/login");
+    return;
+  }
+
+  setTimeout(() => {
+    setLoading(false);
+  }, 2000);
+
+}, [router]);
 
   return (
     <>

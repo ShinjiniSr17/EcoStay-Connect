@@ -1,15 +1,55 @@
 "use client";
-
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import toast from "react-hot-toast";
 
+
 export default function Login() {
-  const handleLogin = () => {
+  const router = useRouter();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const handleLogin = async () => {
+  try {
+    const response = await fetch("http://localhost:5001/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      toast.error(data.message);
+      return;
+    }
+
+    localStorage.setItem("token", data.token);
+
     toast.success("Login Successful!");
-  };
+
+    router.push("/dashboard");
+
+  } catch (error) {
+    toast.error("Something went wrong");
+    console.error(error);
+  }
+};
+async function handleGoogleLogin() {
+  await signIn("google", {
+    callbackUrl: "/dashboard",
+  });
+}
 
   return (
     <>
@@ -29,12 +69,16 @@ export default function Login() {
               label="Email"
               type="email"
               placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
 
             <Input
               label="Password"
               type="password"
               placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
 
             <Button
@@ -44,6 +88,12 @@ export default function Login() {
             >
               Login
             </Button>
+            <button
+  onClick={handleGoogleLogin}
+  className="w-full mt-4 bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg"
+>
+  Sign in with Google
+</button>
 
           </div>
 

@@ -2,12 +2,14 @@
 
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 
 const API = "http://localhost:5001/api/stays";
 
 export default function AdminPage() {
+  const router = useRouter();
   const [stays, setStays] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -40,8 +42,17 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    fetchStays();
-  }, []);
+
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    router.push("/login");
+    return;
+  }
+
+  fetchStays();
+
+}, [router]);
 
   // Handle form input
   function handleChange(e) {
@@ -85,6 +96,7 @@ export default function AdminPage() {
   // Add / Update
   async function handleSubmit(e) {
     e.preventDefault();
+    const token = localStorage.getItem("token");
 
     try {
       let response;
@@ -94,6 +106,7 @@ export default function AdminPage() {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             ...formData,
@@ -106,6 +119,7 @@ export default function AdminPage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             ...formData,
@@ -136,13 +150,17 @@ export default function AdminPage() {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this stay?"
     );
+    const token = localStorage.getItem("token");
 
     if (!confirmDelete) return;
 
     try {
       const res = await fetch(`${API}/${id}`, {
-        method: "DELETE",
-      });
+      method: "DELETE",
+      headers: {
+      Authorization: `Bearer ${token}`,
+      },
+    });
 
       if (!res.ok) {
         throw new Error("Failed to delete stay");

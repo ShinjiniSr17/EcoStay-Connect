@@ -1,7 +1,7 @@
 console.log("📂 stays.js LOADED");
 const express = require("express");
 const router = express.Router();
-
+const verifyToken = require("../middleware/verifyToken");
 const Stay = require("../models/Stay");
 
 // ===============================
@@ -74,7 +74,7 @@ router.get("/:id", async (req, res, next) => {
 // CREATE STAY
 // POST /api/stays
 // ===============================
-router.post("/", async (req, res, next) => {
+router.post("/", verifyToken, async (req, res, next) => {
   try {
     const { name, location, price, rating, image } = req.body;
 
@@ -105,7 +105,7 @@ router.post("/", async (req, res, next) => {
 // UPDATE STAY
 // PUT /api/stays/:id
 // ===============================
-router.put("/:id", async (req, res, next) => {
+router.put("/:id", verifyToken, async (req, res, next) => {
   try {
     const updatedStay = await Stay.findByIdAndUpdate(
       req.params.id,
@@ -135,7 +135,7 @@ router.put("/:id", async (req, res, next) => {
 // DELETE STAY
 // DELETE /api/stays/:id
 // ===============================
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id", verifyToken, async (req, res, next) => {
   try {
     const deletedStay = await Stay.findByIdAndDelete(req.params.id);
 

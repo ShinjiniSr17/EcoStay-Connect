@@ -1,117 +1,331 @@
-*EcoStay Connect – Week 5*
-A full-stack eco-tourism stay listing platform built during the TBI-GEU AI Assisted Full Stack Web Development Internship.
+# EcoStay Connect – Week 6
 
-*Tech Stack*
-Frontend
-Next.js
-React
-Tailwind CSS
-Fetch API
+A full-stack eco-tourism stay listing platform built during the **TBI-GEU AI Assisted Full Stack Web Development Internship**.
 
-*Backend*
-Node.js
-Express.js
-MongoDB Atlas
-Mongoose
-CORS
-Dotenv
+---
 
-*Why MongoDB?*
-MongoDB was selected because EcoStay stores stay listings as flexible documents. It allows easy scaling and makes it convenient to store fields such as name, location, price, rating, and image URL.
+# Tech Stack
 
-*Database Schema*
-Stay Collection
+## Frontend
+- Next.js
+- React
+- Tailwind CSS
+- Fetch API
+- NextAuth.js (Auth.js)
 
-_id             ObjectId
-name            String
-location        String
-price           Number
-rating          Number
-image           String
-createdAt       Date
-updatedAt       Date
+## Backend
+- Node.js
+- Express.js
+- MongoDB Atlas
+- Mongoose
+- JWT (jsonwebtoken)
+- bcrypt
+- express-validator
+- express-rate-limit
+- CORS
+- dotenv
+
+---
+
+# Why MongoDB?
+
+MongoDB was selected because EcoStay stores stay listings as flexible documents. It allows easy scaling and makes it convenient to store fields such as:
+
+- Stay Name
+- Location
+- Price
+- Rating
+- Image URL
+
+It also stores user accounts securely for authentication.
+
+---
+
+# Database Schema
+
+## Stay Collection
+
+| Field | Type |
+|-------|------|
+| _id | ObjectId |
+| name | String |
+| location | String |
+| price | Number |
+| rating | Number |
+| image | String |
+| createdAt | Date |
+| updatedAt | Date |
+
+## User Collection
+
+| Field | Type |
+|-------|------|
+| _id | ObjectId |
+| email | String |
+| password | String (bcrypt Hashed) |
+| createdAt | Date |
+| updatedAt | Date |
 
 ![Schema Diagram](images/Schema Diagram.png)
 
-*Project Structure*
+---
 
+# Project Structure
+
+```
 ecostay-connect/
+
 ├── backend/
-│ ├── models/
-│ │ └── Stay.js
-│ ├── middleware/
-│ ├── routes/
-│ ├── .env (ignored from Git)
-│ ├── .env.example
-│ ├── package.json
-│ └── server.js
 │
-└── frontend/
-├── public/
-├── src/
+├── models/
+│   ├── Stay.js
+│   └── User.js
+│
+├── middleware/
+│   └── verifyToken.js
+│
+├── routes/
+│   ├── stays.js
+│   └── auth.js
+│
+├── .env
+├── .env.example
 ├── package.json
-└── ...
+└── server.js
 
-*Backend Setup*
+frontend/
 
-1. Navigate to backend
+├── src/
+│
+├── app/
+│   ├── login/
+│   ├── dashboard/
+│   ├── admin/
+│   └── api/auth/[...nextauth]/
+│
+├── components/
+│
+├── auth.js
+├── .env.local
+└── package.json
+```
+
+---
+
+# Backend Setup
+
+### 1. Navigate to backend
+
+```bash
 cd backend
+```
 
-2. Install dependencies
+### 2. Install dependencies
+
+```bash
 npm install
+```
 
-3. Create a .env file
-Copy .env.example and add your MongoDB Atlas connection string.
+### 3. Create a .env file
 
+Copy `.env.example`
+
+```
 PORT=5001
-MONGO_URI=your_mongodb_atlas_connection_string
 
-4. Start the backend
+MONGO_URI=your_mongodb_connection
+
+JWT_SECRET=your_secret_key
+```
+
+### 4. Start backend
+
+```bash
 node server.js
-The backend will run at http://localhost:5001.
+```
 
-*Frontend Setup*
+Backend runs on:
 
-1. Navigate to frontend
+```
+http://localhost:5001
+```
+
+---
+
+# Frontend Setup
+
+### 1. Navigate to frontend
+
+```bash
 cd frontend
+```
 
-2. Install dependencies
+### 2. Install dependencies
+
+```bash
 npm install
+```
 
-3. Start the frontend
+### 3. Configure Authentication
+
+Create `.env.local`
+
+```
+GOOGLE_CLIENT_ID=your_google_client_id
+
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+NEXTAUTH_SECRET=your_nextauth_secret
+
+NEXTAUTH_URL=http://localhost:3000
+```
+
+### 4. Start frontend
+
+```bash
 npm run dev
-The frontend will run at http://localhost:3000.
+```
 
-*REST API Endpoints*
-Method          Endpoint                           Description
+Frontend runs on:
 
-GET             /api/stays                         Get all stays
-GET             /api/stays/:id                     Get stay by ID
-GET             /api/stays/search?q=keyword        Search stays
-POST            /api/stays                         Create a new stay
-PUT             /api/stays/:id                     Update a stay
-DELETE          /api/stays/:id                     Delete a stay
+```
+http://localhost:3000
+```
 
-*Features*
+---
 
-Modern eco-tourism stay listing UI.
-MongoDB Atlas database integration.
-Persistent data storage.
-Full CRUD operations.
-Search functionality.
-Centralized error handling.
-Environment variable configuration.
-Responsive frontend with Tailwind CSS.
-Admin dashboard for managing stays.
+# REST API Endpoints
 
-*Learning Outcomes*
+## Stay APIs
 
-Integrated a real cloud database (MongoDB Atlas)
-Designed a Mongoose schema
-Built persistent CRUD APIs
-Connected frontend and backend end-to-end
-Managed environment variables securely
-Debugged API and database integration issues
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| GET | /api/stays | Get all stays |
+| GET | /api/stays/:id | Get stay by ID |
+| GET | /api/stays/search?q=keyword | Search stays |
+| POST | /api/stays | Create stay (Protected) |
+| PUT | /api/stays/:id | Update stay (Protected) |
+| DELETE | /api/stays/:id | Delete stay |
 
-*Author*
-Developed as part of the TBI-GEU AI Assisted Full Stack Web Development Internship – Week 5
+---
+
+## Authentication APIs
+
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| POST | /api/auth/register | Register User |
+| POST | /api/auth/login | Login User & Generate JWT |
+
+---
+
+# Authentication Flow
+
+### User Registration
+
+- User submits email and password.
+- Password is hashed using **bcrypt**.
+- User is stored securely in MongoDB.
+
+---
+
+### User Login
+
+- Credentials are verified.
+- JWT token is generated.
+- Token is returned to the frontend.
+- JWT token is stored on the client after successful login.
+
+---
+
+### Protected APIs
+
+Protected routes require:
+
+```
+Authorization
+
+Bearer <JWT_TOKEN>
+```
+
+If no valid token is provided:
+
+```
+401 Unauthorized
+```
+
+is returned.
+
+---
+
+### Google OAuth Login
+
+Implemented using **Auth.js (NextAuth v5)**.
+
+Users can sign in securely using their Google account without creating a password.
+
+---
+
+# Security Features
+
+- Password hashing using bcrypt
+- JWT Authentication
+- Protected API Routes
+- Protected Frontend Routes
+- Google OAuth Login
+- Request Validation using express-validator
+- Rate Limiting using express-rate-limit
+- CORS Configuration
+- Environment Variables
+- Secure Password Storage
+
+---
+
+# Features
+
+- Modern Eco-Tourism Stay Listing UI
+- MongoDB Atlas Integration
+- Full CRUD Operations
+- Search Functionality
+- Secure User Authentication
+- JWT Protected Routes
+- Google OAuth Login
+- Input Validation
+- Rate Limiting
+- Admin Dashboard
+- Responsive Design
+- Centralized Error Handling
+- Google OAuth Authentication using Auth.js
+
+---
+
+# Learning Outcomes
+
+During Week 6 I learned how to:
+
+- Implement secure user authentication
+- Hash passwords using bcrypt
+- Generate and verify JWT tokens
+- Protect backend APIs using middleware
+- Protect frontend routes
+- Implement Google OAuth Login
+- Validate API inputs using express-validator
+- Apply rate limiting to authentication routes
+- Secure environment variables
+- Understand authentication and authorization concepts
+- Integrated third-party authentication using Google OAuth (Auth.js)
+---
+
+# Future Improvements
+
+- Role-Based Access Control (Admin/User)
+- Refresh Tokens
+- Password Reset via Email
+- User Profile Management
+- Booking System
+- Payment Gateway Integration
+
+---
+
+# Author
+
+Developed as part of the **TBI-GEU AI Assisted Full Stack Web Development Internship – Week 6**
