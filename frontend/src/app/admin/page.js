@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import toast from "react-hot-toast";
+import Loader from "../../components/ui/Loader";
 
 const API = "http://localhost:5001/api/stays";
 
@@ -97,7 +99,29 @@ export default function AdminPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     const token = localStorage.getItem("token");
+    if (
+  !formData.name ||
+  !formData.location ||
+  !formData.price ||
+  !formData.image
+) {
+  toast.error("Please fill all required fields.");
+  return;
+}
 
+if (Number(formData.price) <= 0) {
+  toast.error("Price must be greater than zero.");
+  return;
+}
+
+if (
+  formData.rating &&
+  (Number(formData.rating) < 0 ||
+    Number(formData.rating) > 5)
+) {
+  toast.error("Rating must be between 0 and 5.");
+  return;
+}
     try {
       let response;
 
@@ -133,7 +157,11 @@ export default function AdminPage() {
         throw new Error("Operation failed");
       }
 
-      alert(editingId ? "Stay Updated Successfully!" : "Stay Added Successfully!");
+      toast.success(
+  editingId
+    ? "Stay updated successfully!"
+    : "Stay added successfully!"
+);
 
       handleCancel();
 
@@ -166,12 +194,12 @@ export default function AdminPage() {
         throw new Error("Failed to delete stay");
       }
 
-      alert("Stay Deleted Successfully!");
+      toast.success("Stay deleted successfully!");
 
       fetchStays();
 
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
     }
   }
 
@@ -180,13 +208,13 @@ export default function AdminPage() {
       <Navbar />
     <main className="min-h-screen bg-emerald-50">
 
-      <h1 className="text-4xl font-bold text-center mb-10">
+      <h1 className="text-4xl font-bold text-center text-emerald-700 mb-10">
         EcoStay Admin Dashboard
       </h1>
 
       {/* FORM */}
 
-      <div className="bg-white rounded-3xl shadow-xl border border-emerald-100 transition duration-300 hover:shadow-2xl">
+      <div className="bg-white rounded-3xl shadow-xl border border-emerald-100 p-8 transition duration-300 hover:shadow-2xl">
 
         <h2 className="text-2xl font-semibold mb-6">
 
@@ -222,6 +250,7 @@ export default function AdminPage() {
           <input
             type="number"
             name="price"
+            min="1"
             placeholder="Price"
             value={formData.price}
             onChange={handleChange}
@@ -232,6 +261,8 @@ export default function AdminPage() {
           <input
             type="number"
             step="0.1"
+            min="0"
+            max="5"
             name="rating"
             placeholder="Rating"
             value={formData.rating}
@@ -280,9 +311,19 @@ export default function AdminPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
         {loading ? (
-          <p>Loading...</p>
+           <Loader />
         ) : stays.length === 0 ? (
-          <p>No stays available.</p>
+          <div className="text-center py-12">
+
+  <h3 className="text-2xl font-semibold text-gray-700">
+    No Eco Stays Yet 🌿
+  </h3>
+
+  <p className="text-gray-500 mt-3">
+    Add your first eco stay using the form above.
+  </p>
+
+</div>
         ) : (
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

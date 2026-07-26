@@ -7,7 +7,7 @@ import Footer from "../../components/Footer";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import toast from "react-hot-toast";
-
+import Link from "next/link";
 
 export default function Login() {
   const router = useRouter();
@@ -94,6 +94,15 @@ async function handleGoogleLogin() {
 >
   Sign in with Google
 </button>
+<p className="text-center text-gray-500 mt-8">
+  Don't have an account?{" "}
+  <Link
+    href="/register"
+    className="text-emerald-600 font-semibold hover:underline"
+  >
+    Create Account
+  </Link>
+</p>
 
           </div>
 

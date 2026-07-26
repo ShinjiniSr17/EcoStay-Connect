@@ -2,8 +2,24 @@
 
 import ThemeToggle from "./ThemeToggle";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Button from "./ui/Button";
 
 export default function Navbar() {
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+  const token = localStorage.getItem("token");
+  setIsLoggedIn(!!token);
+  }, []);
+
+  const handleLogout = () => {
+  localStorage.removeItem("token");
+  setIsLoggedIn(false);
+  router.push("/");
+  };
   return (
     <nav className="bg-white dark:bg-gray-900 shadow-md px-6 md:px-8 py-5 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-0 z-50">
 
@@ -23,14 +39,28 @@ export default function Navbar() {
           About
         </Link>
 
+        {isLoggedIn ? (
+  <>
+    <Link href="/dashboard" className="hover:text-emerald-600">
+      Dashboard
+    </Link>
+
+    <Link href="/ai" className="hover:text-emerald-600">
+      AI Planner
+    </Link>
+  </>
+) : (
+  <Link href="/login" className="hover:text-emerald-600">
+    Login
+  </Link>
+    )}
+
+
         <Link href="/admin" className="hover:text-emerald-600">
           Host Dashboard
         </Link>
 
-        <Link href="/login" className="hover:text-emerald-600">
-          Login
-        </Link>
-
+       
       </div>
 
       {/* Theme Toggle + Sign In */}
@@ -38,12 +68,21 @@ export default function Navbar() {
 
         <ThemeToggle />
 
-        <Link
-          href="/login"
-          className="bg-emerald-600 text-white px-5 py-2 rounded-full hover:bg-emerald-700 transition"
-        >
-          Sign In
-        </Link>
+        {isLoggedIn ? (
+  <Button
+    variant="outline"
+    onClick={handleLogout}
+  >
+    Logout
+  </Button>
+) : (
+  <Link
+    href="/login"
+    className="bg-emerald-600 text-white px-5 py-2 rounded-full hover:bg-emerald-700 transition"
+  >
+    Sign In
+  </Link>
+)}
 
       </div>
 

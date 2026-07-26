@@ -2,8 +2,10 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const verifyToken = require("../middleware/verifyToken");
 const { body, validationResult } = require("express-validator");
 const authLimiter = require("../middleware/rateLimiter");
+
 
 const router = express.Router();
 
@@ -118,6 +120,33 @@ res.status(200).json({
         email: user.email,
       },
     });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+});
+
+
+
+// ===============================
+// GET CURRENT USER
+// GET /api/auth/me
+// ===============================
+router.get("/me", verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json(user);
 
   } catch (error) {
     console.error(error);

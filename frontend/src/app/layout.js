@@ -2,6 +2,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import Toast from "../components/ui/Toast";
 import Providers from "../components/Providers";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -20,9 +21,11 @@ export default function RootLayout({ children }) {
   className={`${poppins.className} bg-gray-50 text-gray-800 antialiased dark:bg-gray-900 dark:text-white`}
 >
   <Providers>
+  <ErrorBoundary>
     <Toast />
     {children}
-  </Providers>
+  </ErrorBoundary>
+</Providers>
 </body> 
     </html>
   );
